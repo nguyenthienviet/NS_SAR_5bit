@@ -1,0 +1,21 @@
+EVcdFile ""
+EVcdInfoFile ""
+VcdFile ""
+VcdInfoFile ""
+VectorFile nil
+allDefinitionFiles ((t "/nfs/work/ic/common/arm/tsmc/cv013nh/sc7_base_svt/r0p1/spice/sc7_cv013nh_base_svt.noRC.spi") (nil "/nfs/work/ic/common/arm/tsmc/cv013nh/sc7_base_svt/r0p1/spice/sc7_cv013nh_base_svt.CC.spi"))
+allDspfFiles nil
+allEVcdFiles nil
+allIncludedPaths nil
+allPspiceFiles nil
+allSpefFiles nil
+allStimulusFiles nil
+allVcdFiles nil
+allVectorFiles nil
+definitionFiles ("/nfs/work/ic/common/arm/tsmc/cv013nh/sc7_base_svt/r0p1/spice/sc7_cv013nh_base_svt.noRC.spi")
+dspfFile nil
+hlcheck "off"
+includePath ""
+pspiceFile nil
+spefFile nil
+stimulusFile nil

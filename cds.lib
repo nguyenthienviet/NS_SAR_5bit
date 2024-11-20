@@ -1,0 +1,14 @@
+undefine basic
+undefine analogLib
+
+# FOR MGC
+undefine basic
+undefine analogLib
+define basic $MGC_AMS_HOME/data/cdslib/618/basic
+define analogLib $MGC_AMS_HOME/data/cdslib/618/analogLib
+define mgcLib $MGC_AMS_HOME/data/cdslib/618/mgcLib
+# FOR CADENCE AHDLLIB
+define ahdlLib $CDSHOME/tools/dfII/samples/artist/ahdlLib
+
+# User-defined libraries
+softdefine adc	adc/cadence

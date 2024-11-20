@@ -1,0 +1,3 @@
+projectDir = '"~/simulation"
+designInfo = '("adc" "ns_sar_adc_tb" "config" "spectre")
+descriptionText = "None"

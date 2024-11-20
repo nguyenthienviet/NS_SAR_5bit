@@ -1,0 +1,80 @@
+// VerilogA for adc, ns_sar_adc_logic, veriloga
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+`define N 10
+
+module ns_sar_adc_logic (CLK, COMP, COMN, DOUT, PH_SAMP, PH_SAMPN, PH_COMP, PH, DP, DN, PH_INT, PH_CNV);
+
+//parameter 	integer 	`N = 10 from [1:20];	// resolution (N)
+parameter 	real 	td = 0 from [0:inf);		// delay time
+parameter 	real 	tf = 0 from [0:inf);		// falling time
+parameter 	real 	tr = 0 from [0:inf);		// rising time
+parameter 	real 	v1 = 1.2;				// voltage level of logic 1
+parameter 	real 	v0 = 0;					// voltage level of logic 0
+parameter	real		vth = (v1+v0)/2;			// logic threshold level
+
+input					CLK, COMP, COMN;
+output		[`N-1:0]		DOUT, DP, DN, PH;
+output					PH_SAMP, PH_SAMPN, PH_COMP, PH_INT, PH_CNV;
+
+electrical				CLK, COMP, COMN;
+electrical	[`N-1:0]		DOUT, DP, DN, PH;
+electrical				PH_SAMP, PH_SAMPN, PH_COMP, PH_INT, PH_CNV;
+integer 					vDP[`N-1:0];
+integer					vDN[`N-1:0];
+integer					vPH[`N-1:0];
+integer					vDOUT[`N-1:0];
+
+genvar	i;
+integer	k;	// counter
+
+analog begin
+	@(initial_step) k = `N+2;
+	// counter
+	@(cross(V(CLK)-vth,+1)) begin
+		if (k == 0)
+			k = `N+2;
+		else
+			k = k-1;
+	end
+////////////////////////// main ///////////////////////////
+	@(cross(V(CLK)-vth,+1)) begin
+		// sampling
+		if (k == `N+2) begin
+			for (i=`N-1; i>=0; i=i-1) begin
+				vPH[i] = 1;
+			end // end for
+		end //end if
+	
+		//conversion
+		else if ((k<=`N) & (k>0)) begin
+			vDP[k-1] = (V(COMP) > vth);
+			vDN[k-1] = (V(COMN) > vth);
+			vPH[k-1] = 0;
+		end // end if
+
+		// output
+		else if (k == 0) begin
+			for (i=`N-1; i>=0; i=i-1) begin
+				vDOUT[i] = vDP[i];
+			end // end for
+		end // end if
+	end // end cross
+
+	// transitions
+	V(PH_SAMP)	<+ transition(k == `N+2 ? v1 : v0, td, tr, tf);
+	V(PH_SAMPN)	<+ transition(k == `N+2 ? v0 : v1, td, tr, tf);
+	V(PH_CNV)	<+ transition((k<`N+2) & (k>0) ? v1 : v0, td, tr, tf);
+	V(PH_INT)	<+ transition(k == 0 	? v1 : v0, td, tr, tf);
+	V(PH_COMP)	<+ transition(!V(CLK) & (k>1) & (k<`N+2) ? v1 : v0, td, tr, tf);
+	for (i=`N-1; i>=0; i=i-1) begin
+		V(PH[i]) <+ transition(vPH[i] ? v1 : v0, td, tr, tf);
+		V(DP[i]) <+ transition(vDP[i] ? v1 : v0, td, tr, tf);
+		V(DN[i]) <+ transition(vDN[i] ? v1 : v0, td, tr, tf);
+		V(DOUT[i]) <+ transition(vDOUT[i] ? v1 : v0, td, tr, tf);
+	end
+end // end analog
+
+endmodule
