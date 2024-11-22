@@ -123,7 +123,7 @@ tmp14 = make_sevVariableStruct()
 (unless tmp14
 tmp14 = (ncons nil)
 )
-tmp14->name = "td"
+tmp14->name = "tt"
 tmp14->expression = "100p"
 tmp14->index = 14
 (unless tmp15
@@ -132,7 +132,7 @@ tmp15 = make_sevVariableStruct()
 (unless tmp15
 tmp15 = (ncons nil)
 )
-tmp15->name = "tt"
+tmp15->name = "td"
 tmp15->expression = "100p"
 tmp15->index = 15
 (unless tmp16
@@ -205,7 +205,7 @@ tmp23 = make_sevVariableStruct()
 tmp23 = (ncons nil)
 )
 tmp23->name = "FCLK"
-tmp23->expression = "13*FS"
+tmp23->expression = "12*FS"
 tmp23->index = 23
 (unless tmp24
 tmp24 = make_sevVariableStruct()

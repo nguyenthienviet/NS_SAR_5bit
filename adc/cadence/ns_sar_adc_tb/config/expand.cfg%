@@ -1,4 +1,4 @@
-//Revision 10
+//Revision 14
 //NOTE
 // Default template for spectre
 // Note:
@@ -14,7 +14,7 @@ viewlist spectre, cmos_sch, \cmos.sch , schematic, veriloga, ahdl, pspice, dspf;
 stoplist spectre;
 
 
-cell adc.ns_sar_adc_dac_int binding :schematic;
+cell adc.ns_sar_adc_dac_int binding :schematic_bypass;
 
 
 endconfig

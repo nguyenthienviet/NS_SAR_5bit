@@ -31,25 +31,25 @@ genvar	i;
 integer	k;	// counter
 
 analog begin
-	@(initial_step) k = `N+2;
+	@(initial_step) k = `N+1;
 	// counter
-	@(cross(V(CLK)-vth,+1)) begin
+	@(cross(V(CLK)-vth,+1)) begin // rising edge
 		if (k == 0)
-			k = `N+2;
+			k = `N+1;
 		else
 			k = k-1;
 	end
 ////////////////////////// main ///////////////////////////
-	@(cross(V(CLK)-vth,+1)) begin
+	@(cross(V(CLK)-vth,+1)) begin // rising edge
 		// sampling
-		if (k == `N+2) begin
+		if (k == `N+1) begin
 			for (i=`N-1; i>=0; i=i-1) begin
 				vPH[i] = 1;
 			end // end for
 		end //end if
-	
+
 		//conversion
-		else if ((k<=`N) & (k>0)) begin
+		/*else if ((k<=`N) & (k>0)) begin
 			vDP[k-1] = (V(COMP) > vth);
 			vDN[k-1] = (V(COMN) > vth);
 			vPH[k-1] = 0;
@@ -60,15 +60,31 @@ analog begin
 			for (i=`N-1; i>=0; i=i-1) begin
 				vDOUT[i] = vDP[i];
 			end // end for
+		end // end if*/
+	end // end cross
+
+	@(cross(V(CLK)-vth,-1)) begin // falling edge
+		//conversion
+		if ((k<=`N) & (k>0)) begin
+			vDP[k-1] = (V(COMP) > vth);
+			vDN[k-1] = (V(COMN) > vth);
+			vPH[k-1] = 0;
+		end // end if
+
+		// output
+		if (k == 0) begin
+			for (i=`N-1; i>=0; i=i-1) begin
+				vDOUT[i] = vDP[i];
+			end // end for
 		end // end if
 	end // end cross
 
 	// transitions
-	V(PH_SAMP)	<+ transition(k == `N+2 ? v1 : v0, td, tr, tf);
-	V(PH_SAMPN)	<+ transition(k == `N+2 ? v0 : v1, td, tr, tf);
-	V(PH_CNV)	<+ transition((k<`N+2) & (k>0) ? v1 : v0, td, tr, tf);
+	V(PH_SAMP)	<+ transition(k == `N+1 ? v1 : v0, td, tr, tf);
+	V(PH_SAMPN)	<+ transition(k == `N+1 ? v0 : v1, td, tr, tf);
+	V(PH_CNV)	<+ transition((k<`N+1) & (k>0) ? v1 : v0, td, tr, tf);
 	V(PH_INT)	<+ transition(k == 0 	? v1 : v0, td, tr, tf);
-	V(PH_COMP)	<+ transition(!V(CLK) & (k>1) & (k<`N+2) ? v1 : v0, td, tr, tf);
+	V(PH_COMP)	<+ transition(!(!V(CLK)) & (k>0) & (k<`N+1) ? v1 : v0, 2*td, tr, tf);
 	for (i=`N-1; i>=0; i=i-1) begin
 		V(PH[i]) <+ transition(vPH[i] ? v1 : v0, td, tr, tf);
 		V(DP[i]) <+ transition(vDP[i] ? v1 : v0, td, tr, tf);
