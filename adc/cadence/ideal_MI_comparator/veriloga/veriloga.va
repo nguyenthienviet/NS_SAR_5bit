@@ -1,0 +1,65 @@
+// VerilogA for adc, ns_sar_comparator, veriloga
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module ns_sar_comparator(OUTN, OUTP, SUB, AVDD, AVSS, INx1, INxg1, INxg2, IPx1, IPxg1, IPxg2, PH_COMP);
+output OUTN;
+electrical OUTN;
+output OUTP;
+electrical OUTP;
+inout SUB;
+electrical SUB;
+input AVDD;
+electrical AVDD;
+input AVSS;
+electrical AVSS;
+input INx1;
+electrical INx1;
+input INxg1;
+electrical INxg1;
+input INxg2;
+electrical INxg2;
+input IPx1;
+electrical IPx1;
+input IPxg1;
+electrical IPxg1;
+input IPxg2;
+electrical IPxg2;
+input PH_COMP;
+electrical PH_COMP;
+parameter real g1 = 4 ;
+parameter real g2 = 16 ;
+parameter real v0 = 0 ;
+parameter real v1 = 1.2 ;
+parameter real td = 100p ;
+parameter real tf = 100p ;
+parameter real tr = 100p ;
+
+real Vx1, Vx4, Vx16;
+real Vin_noissy;
+real Vout;
+
+analog begin
+	Vx1 = V(IPx1)-V(INx1) + noise_table({0.1,13.5e-9/1,1,0.84e-9/1,10,52e-12/1,100,4e-12/1,1e3,0.25e-12/1,1e4,12e-15/1,1e5,0.4e-15/1,1e6,0.4e-15/1}, "comp x1");
+	Vx4 = V(IPxg1)-V(INxg1) + noise_table({0.1,13.5e-9/4,1,0.84e-9/4,10,52e-12/4,100,4e-12/4,1e3,0.25e-12/4,1e4,12e-15/4,1e5,0.4e-15/4,1e6,0.4e-15/4}, "comp x4");
+	Vx16 = V(IPxg2)-V(INxg2) + noise_table({0.1,13.5e-9/16,1,0.84e-9/16,10,52e-12/16,100,4e-12/16,1e3,0.25e-12/16,1e4,12e-15/16,1e5,0.4e-15/16,1e6,0.4e-15/16}, "comp x16");
+
+	Vin_noissy = Vx1 + 4*Vx4 + 16*Vx16;
+
+	@ (cross( V(PH_COMP) - v1/2, +1 )) begin
+		if (Vin_noissy > 0) begin 
+			Vout = 1;
+		end
+		else begin 	
+       		Vout = 0;
+		end
+	end
+
+	V(OUTP) <+ transition(Vout*v1,td,tf,tr);
+	V(OUTN) <+ transition((1-Vout)*v1,td,tf,tr);
+
+end
+
+
+endmodule
